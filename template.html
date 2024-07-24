@@ -148,7 +148,8 @@
         <p style="font-family: 'Courier New', Courier, monospace; font-weight: bolder;"> {{.Address}}</p>
         <h2>Private Key (KEEP PRIVATE!)</h2>
         <label for="password">Please Input Your password: </label>
-        <input type="password" id="password"><button onclick="decryptData()">Decrypt</button>
+        <input type="password" id="password">
+        <button onclick="decryptData()">Decrypt</button>
         <h3>Decrypted mnemonics:</h3>
         <ol id="mnemonic"></ol>
     </div>
@@ -175,37 +176,60 @@
 </page>
 </body>
 <script>
-    function extendKey(key, length) {
-        const keyBytes = Array.from(key).map(char => char.charCodeAt(0));
-        const extended = new Array(length);
-        for (let i = 0; i < length; i++) {
-            extended[i] = keyBytes[i % keyBytes.length];
-        }
-        return extended;
-    }
+    function KSA(key) {
+        const keyLength = key.length;
+        const S = new Array(256);
 
-    function xorEncryptDecrypt(input, key) {
-        const decodedInput = atob(input);
-        const keyBytes = extendKey(key, decodedInput.length);
-        let result = '';
-
-        for (let i = 0; i < decodedInput.length; i++) {
-            const charCode = decodedInput.charCodeAt(i) ^ keyBytes[i];
-            result += String.fromCharCode(charCode);
+        for (let i = 0; i < 256; i++) {
+            S[i] = i;
         }
 
-        return result;
+        let j = 0;
+        for (let i = 0; i < 256; i++) {
+            j = (j + S[i] + key.charCodeAt(i % keyLength)) % 256;
+            [S[i], S[j]] = [S[j], S[i]];
+        }
+
+        return S;
     }
+
+    function PRGA(S) {
+        const keyStream = [];
+        let i = 0, j = 0;
+
+        while (keyStream.length < 256) {
+            i = (i + 1) % 256;
+            j = (j + S[i]) % 256;
+            [S[i], S[j]] = [S[j], S[i]]; // Swap S[i] and S[j]
+            const K = S[(S[i] + S[j]) % 256];
+            keyStream.push(K);
+        }
+
+        return keyStream;
+    }
+    function RC4(key, cipherText) {
+        const S = KSA(key);
+        const keyStream = PRGA(S);
+        const plainText = [];
+
+        for (let i = 0; i < cipherText.length; i++) {
+            const cipherChar = cipherText.charCodeAt(i);
+            const plainChar = cipherChar ^ keyStream[i];
+            plainText.push(String.fromCharCode(plainChar));
+        }
+
+        return plainText.join('');
+    }
+
 
     function decryptData() {
         const encryptedData = "{{.Mnemonic}}";
         const key = document.getElementById('password').value;
-        const decrypedData = xorEncryptDecrypt(encryptedData, key);
-        const mnemonicArray = decrypedData.split(' ');
+        const cipherText = atob(encryptedData);
+        const decryptedText = RC4(key, cipherText);
+        const mnemonicArray = decryptedText.split(' ');
         const mnemonicList = document.getElementById('mnemonic');
-        // 清空现有列表
         mnemonicList.innerHTML = '';
-        // 遍历数组并生成列表项
         mnemonicArray.forEach((item) => {
             const li = document.createElement('li');
             const span = document.createElement('span');
