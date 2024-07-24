@@ -44,7 +44,3 @@ func printErrorAndExit(err error) {
 	fmt.Fprintf(os.Stderr, "A critical error occured:\n%+v\n", err)
 	os.Exit(1)
 }
-
-func printUsage() {
-	fmt.Println("Usage: kaspaper [filename.html]")
-}
