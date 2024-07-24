@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"github.com/kaspanet/kaspad/domain/dagconfig"
 	"github.com/pkg/errors"
-	"github.com/svarogg/kaspaper/kaspaperlib"
 	"io/ioutil"
+	"kaspaper2.0/kaspaperlib"
 	"os"
 )
 
@@ -43,4 +43,8 @@ func main() {
 func printErrorAndExit(err error) {
 	fmt.Fprintf(os.Stderr, "A critical error occured:\n%+v\n", err)
 	os.Exit(1)
+}
+
+func printUsage() {
+	fmt.Println("Usage: kaspaper [filename.html]")
 }

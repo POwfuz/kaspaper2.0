@@ -6,7 +6,7 @@ import (
 	"encoding/base64"
 	"text/template"
 
-	"github.com/svarogg/kaspaper/model"
+	"kaspaper2.0/model"
 )
 
 //go:embed template.html

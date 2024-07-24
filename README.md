@@ -16,6 +16,3 @@ Then open the generated wallet file from your browser, print and gift to your lo
 
 ## Donate
 kaspa:qz9faqjwcqhwhx0s6uhcm8t5wju78hz2vcucfgwdlfl3tayjg49wz6ugqjpm6
-
-## Reference
-[KASPAPER](https://github.com/svarogg/kaspaper)

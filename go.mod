@@ -1,4 +1,4 @@
-module github.com/svarogg/kaspaper
+module kaspaper2.0
 
 go 1.17
 
