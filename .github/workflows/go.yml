@@ -1,7 +1,5 @@
 name: Build and upload assets
-on:
-  release:
-    types: [ published ]
+on: workflow_dispatch
 
 jobs:
   build:
