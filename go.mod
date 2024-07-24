@@ -1,6 +1,6 @@
 module kaspaper2.0
 
-go 1.17
+go 1.22
 
 require (
 	github.com/kaspanet/kaspad v0.11.7
