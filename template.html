@@ -142,19 +142,15 @@
 
     <p id="website">
         For instruction for transferring money from a Kaspaper wallet or creating more Kaspaper wallets please visit
-        <strong>https://github.com/svarogg/kaspaper</strong>.
+        <strong>https://github.com/POwfuz/kaspaper2.0</strong>.
     </p>
     <div>
         <p style="font-family: 'Courier New', Courier, monospace; font-weight: bolder;"> {{.Address}}</p>
         <h2>Private Key (KEEP PRIVATE!)</h2>
-        <p id="decryptData">{{.Mnemonic}}</p>
-        <br>
-        <label for="password">Your password:</label>
-        <input type="password" id="password">
-        <br>
-        <button onclick="decryptData()">Decrypt</button>
-        <h3>Decrypted Text:</h3>
-        <p id="decryptedText"></p>
+        <label for="password">Please Input Your password: </label>
+        <input type="password" id="password"><button onclick="decryptData()">Decrypt</button>
+        <h3>Decrypted mnemonics:</h3>
+        <ol id="mnemonic"></ol>
     </div>
     <div id="scissors"></div>
     <div>
@@ -164,7 +160,7 @@
             AS<span style="font-family:Brush Script MT, Brush Script Std, cursive">PAPER</span> - KASPA Paper Wallet
         </h1>
 
-        <p id="url">https://github.com/svarogg/kaspaper</p>
+        <p id="url">https://github.com/POwfuz/kaspaper2.0</p>
         <div class="QR">
             <img id="QR" src="data:image/png;base64, {{.AddressQR}}" alt="Address QR"/>
         </div>
@@ -202,9 +198,21 @@
     }
 
     function decryptData() {
-        const encryptedData = document.getElementById('decryptData').textContent.trim();
+        const encryptedData = "{{.Mnemonic}}";
         const key = document.getElementById('password').value;
-        document.getElementById('decryptedText').textContent = xorEncryptDecrypt(encryptedData, key);
+        const decrypedData = xorEncryptDecrypt(encryptedData, key);
+        const mnemonicArray = decrypedData.split(' ');
+        const mnemonicList = document.getElementById('mnemonic');
+        // 清空现有列表
+        mnemonicList.innerHTML = '';
+        // 遍历数组并生成列表项
+        mnemonicArray.forEach((item) => {
+            const li = document.createElement('li');
+            const span = document.createElement('span');
+            span.textContent = item;
+            li.appendChild(span);
+            mnemonicList.appendChild(li);
+        });
     }
 </script>
 </html>
