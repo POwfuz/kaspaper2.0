@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"crypto/rc4"
 	_ "embed"
 	"encoding/base64"
 	"text/template"
@@ -53,7 +54,10 @@ func walletToWalletTempalte(wallet model.KaspaperWallet, password string) (*wall
 	}
 	addressQRBase64 := base64.StdEncoding.EncodeToString(addressQRbytes)
 
-	encryptedMnemonic := encrypt(wallet.Mnemonic().String(), password)
+	encryptedMnemonic, err := rc4Encrypt(wallet.Mnemonic().String(), password)
+	if err != nil {
+		return nil, err
+	}
 
 	return &walletTemplate{
 		Mnemonic:  encryptedMnemonic,
@@ -61,20 +65,14 @@ func walletToWalletTempalte(wallet model.KaspaperWallet, password string) (*wall
 		AddressQR: addressQRBase64,
 	}, nil
 }
-func extendKey(key string, length int) []byte {
-	keyBytes := []byte(key)
-	extended := make([]byte, length)
-	for i := 0; i < length; i++ {
-		extended[i] = keyBytes[i%len(keyBytes)]
-	}
-	return extended
-}
 
-func encrypt(input, key string) string {
-	keyBytes := extendKey(key, len(input))
-	result := make([]byte, len(input))
-	for i := 0; i < len(input); i++ {
-		result[i] = input[i] ^ keyBytes[i]
+func rc4Encrypt(data, key string) (string, error) {
+	cipher, err := rc4.NewCipher([]byte(key))
+	if err != nil {
+		return "", err
 	}
-	return base64.StdEncoding.EncodeToString(result)
+	plainText := []byte(data)
+	cipherText := make([]byte, len(plainText))
+	cipher.XORKeyStream(cipherText, plainText)
+	return base64.StdEncoding.EncodeToString(cipherText), nil
 }
